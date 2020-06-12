@@ -1,4 +1,4 @@
-import { UserModule } from './framework/controller/user/users.module';
+import { UserModule } from './userModule/users.module';
 import { Module } from '@nestjs/common';
 
 @Module({

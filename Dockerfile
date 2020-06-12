@@ -23,6 +23,6 @@ RUN npm install --only=production
 
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
-
+#esto falla la primera vez porque nunca ha transpilado?
+COPY --from=development /usr/src/app/dist ./dist 
 CMD ["node", "dist/main"]
