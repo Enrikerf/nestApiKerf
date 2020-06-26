@@ -1,3 +1,5 @@
+import { City } from './../entity/City';
+import { createConnection, getRepository, getConnectionManager } from 'typeorm';
 import { AuthGuard, Roles } from './../common/guards/AuthGuard';
 import { UserDto } from './models/user.dto';
 import { ParseIntPipe } from './../common/pipes/parseInt.pipe';
@@ -20,43 +22,52 @@ import {
 @Controller('users')
 @UseGuards(AuthGuard)
 export class UsersController {
+  private users;
+
   constructor(private userService: UsersService) {}
 
   @Get()
-  @Roles('admin')
-  findAll(): User[] {
-    return this.userService.findAll();
+  async findAll(): Promise<User[]> {
+    return await this.userService.findAll();
   }
 
   @Get(':id')
-  findById(@Param('id', new ParseIntPipe()) id: number): User {
+  findById(@Param('id', new ParseIntPipe()) id: number): Promise<User> {
     return this.userService.findById(id);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  createUser(@Body('name') userDto: UserDto): User {
+  createUser(@Body() userDto: UserDto): Promise<User> {
     return this.userService.create(userDto);
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe())
   modifyUser(
     @Param('id', new ParseIntPipe()) id: number,
-    @Body('name') name: string,
-  ): User {
-    return this.userService.modifyById(id, name);
+    @Body() userDto: UserDto,
+  ): Promise<User> {
+    return this.userService.modifyById(id, userDto);
   }
 
   @Put(':id')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
   updateUser(
     @Param('id', new ParseIntPipe()) id: number,
-    @Body('name') name: string,
-  ): User {
-    return this.userService.updateById(id, name);
+    @Body() userDto: UserDto,
+  ): Promise<User> {
+    return this.userService.updateById(id, userDto);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id', new ParseIntPipe()) id: number): User {
+  deleteUser(@Param('id', new ParseIntPipe()) id: number): Promise<User> {
     return this.userService.deleteById(id);
   }
 }

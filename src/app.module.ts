@@ -1,9 +1,18 @@
+import "reflect-metadata";
 import { UserModule } from './userModule/users.module';
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { Connection, getConnectionManager } from 'typeorm';
 @Module({
-  imports: [UserModule],
+  imports: [
+    TypeOrmModule.forRoot(),
+    UserModule,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private connection: Connection) {
+  }
+}

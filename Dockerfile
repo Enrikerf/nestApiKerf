@@ -1,4 +1,4 @@
-FROM node:alpine As development
+FROM node:12.13-alpine As development
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:alpine as production
+FROM node:12.13-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -23,6 +23,6 @@ RUN npm install --only=production
 
 COPY . .
 
-#esto falla la primera vez porque nunca ha transpilado?
-COPY --from=development /usr/src/app/dist ./dist 
+COPY --from=development /usr/src/app/dist ./dist
+
 CMD ["node", "dist/main"]
