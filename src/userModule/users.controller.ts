@@ -1,9 +1,7 @@
-import { City } from './../entity/City';
-import { createConnection, getRepository, getConnectionManager } from 'typeorm';
-import { AuthGuard, Roles } from './../common/guards/AuthGuard';
+import { User } from './../entity/User';
+import { AuthGuard } from './../common/guards/AuthGuard';
 import { UserDto } from './models/user.dto';
 import { ParseIntPipe } from './../common/pipes/parseInt.pipe';
-import { User } from './models/user.interface';
 import { UsersService } from './users.service';
 import {
   Controller,
@@ -13,7 +11,7 @@ import {
   Param,
   Patch,
   Put,
-  Delete,
+  Delete, 
   UsePipes,
   ValidationPipe,
   UseGuards,
@@ -27,8 +25,8 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  async findAll(): Promise<User[]> {
-    return await this.userService.findAll();
+  findAll(): Promise<User[]> {
+    return this.userService.findAll();
   }
 
   @Get(':id')
@@ -43,7 +41,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UsePipes(new ValidationPipe())
+  @UsePipes(ValidationPipe)
   modifyUser(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() userDto: UserDto,

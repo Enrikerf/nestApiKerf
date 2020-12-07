@@ -14,5 +14,6 @@ import { Connection, getConnectionManager } from 'typeorm';
 })
 export class AppModule {
   constructor(private connection: Connection) {
+    console.log('main module loaded');
   }
 }

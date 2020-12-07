@@ -1,12 +1,10 @@
+import { dataBaseException } from './exceptions/dataBase.exception';
 import { User } from './../entity/User';
-import { City } from './../entity/City';
-import { async } from 'rxjs/internal/scheduler/async';
-import { createConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserDto } from './models/user.dto';
-import { repeatedUserException } from './exceptions/repeatedUser.exception';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable } from 'rxjs';
+
 
 @Injectable()
 export class UsersService {
@@ -16,39 +14,61 @@ export class UsersService {
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    try {
+      return await this.userRepository.find();
+    } catch (error) {
+      throw new dataBaseException(error);
+    }
   }
 
   async findById(userId: number): Promise<User> {
-    return this.userRepository.findOne(userId);
+    try {
+      const user = await this.userRepository.findOne(userId);
+      if (!user) {
+        throw new NotFoundException(userId);
+      }
+      return user;
+    } catch (error) {
+      throw new dataBaseException(error);
+    }
   }
 
   async create(userDto: UserDto): Promise<any> {
-    return this.userRepository.insert(userDto);
+    try {
+      return await this.userRepository.insert(userDto);
+    } catch (error) {
+      throw new dataBaseException(error);
+    }
   }
 
   async modifyById(userId: number, userDto: UserDto): Promise<User> {
     try {
-      const userToUpdate = await this.userRepository.findOne(userId);
-      const userUpdated = await this.userRepository.merge(userToUpdate, userDto);
-      return await this.userRepository.save(userUpdated);
-    } catch (er) {
-      console.log('estoy manejando el error en el patch');
+      const user2Modify = await this.findById(userId);
+      const userModified = await this.userRepository.merge(
+        user2Modify,
+        userDto,
+      );
+      return await this.userRepository.save(userModified);
+    } catch (error) {
+      throw new dataBaseException(error);
     }
   }
 
   async updateById(userId: number, userDto: UserDto): Promise<any> {
     try {
       const userToUpdate = await this.userRepository.findOne(userId);
-     return await this.userRepository.update(userToUpdate, userDto);
+      return await this.userRepository.update(userToUpdate, userDto);
     } catch (error) {
-      console.log('estoy manejando el error');
-      throw new repeatedUserException(error)
+      throw new dataBaseException(error);
     }
   }
 
   async deleteById(userId: number): Promise<User> {
-    const userToDelete = await this.userRepository.findOne(userId);
-    return this.userRepository.remove(userToDelete);
+    try {
+      const userToDelete = await this.userRepository.findOne(userId);
+      return await this.userRepository.remove(userToDelete);
+    } catch (error) {
+      throw new dataBaseException(error);
+    }
   }
 }

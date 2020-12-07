@@ -1,5 +1,4 @@
 import { User } from './../entity/User';
-import { City } from './../entity/City';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersService } from './users.service';
